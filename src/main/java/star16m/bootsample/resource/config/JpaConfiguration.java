@@ -1,4 +1,4 @@
-package star16m.batchsample.resource.config;
+package star16m.bootsample.resource.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;

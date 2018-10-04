@@ -5,11 +5,11 @@ import star16m.bootsample.resource.service.error.SimpleException;
 import star16m.bootsample.resource.utils.SimpleUtil;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.Optional;
 
-public abstract class AbstractService<T extends AbstractEntity, I extends Integer> {
-    private AbstractRepository<T, I> simpleRepository;
+public abstract class AbstractService<T extends AbstractEntity, ID> {
+    private AbstractRepository<T, ID> simpleRepository;
 
     public AbstractService(AbstractRepository simpleRepository) {
         this.simpleRepository = simpleRepository;
@@ -18,28 +18,34 @@ public abstract class AbstractService<T extends AbstractEntity, I extends Intege
         return simpleRepository.findAll();
     }
 
-    public Optional<T> findOne(I id) {
+    public Optional<T> findOne(ID id) {
         SimpleUtil.mustNotNull(id);
         return this.simpleRepository.findById(id);
     }
 
     public T save(T object) {
-        Objects.nonNull(object);
+        // object must not null
+        SimpleUtil.mustNotNull(object);
+        // object#id must not null
+        SimpleUtil.mustNotNull(object.getId());
         return this.simpleRepository.save(object);
     }
 
-    public void delete(T object) throws SimpleException {
-        SimpleUtil.mustNotNull(object);
-        I id = (I) object.getId();
-        Optional<T> deleteObject = findOne(id);
-        deleteObject.orElseThrow(() -> new SimpleException("not found delete id [ + " + id + "]"));
-        this.simpleRepository.delete(object);
-        deleteObject = findOne(id);
-        SimpleUtil.mustNull(deleteObject);
+    public T update(ID id, Map<String, Object> map) {
+        // object#id must not null
+        SimpleUtil.mustNotNull(id);
+        return simpleRepository.findById(id)
+                .map(o -> {
+                    patchedObject(o, map);
+                    return simpleRepository.save(o);
+                })
+                .orElse(null);
     }
 
-    public void delete(I id) throws SimpleException {
-        Optional<T> object = findOne(id);
-        delete(object.get());
+    protected abstract void patchedObject(final T o, final Map<String, Object> map);
+
+    public void delete(ID id) throws SimpleException {
+        SimpleUtil.mustNotNull(id);
+        this.simpleRepository.deleteById(id);
     }
 }

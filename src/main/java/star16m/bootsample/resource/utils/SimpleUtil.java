@@ -1,14 +1,20 @@
 package star16m.bootsample.resource.utils;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import star16m.bootsample.resource.service.error.SimpleException;
-import star16m.bootsample.resource.web.action.ResponseEntity;
 
+import java.util.Collection;
 import java.util.Objects;
 
 public class SimpleUtil {
     private SimpleUtil() {}
 
+    public static void mustMin(Collection collection, int minSize) {
+        if (collection == null || collection.size() <= minSize) {
+            throw new SimpleException("Object cannot be longer than {} characters", minSize);
+        }
+    }
     public static void mustNotNull(Object object) {
         if (isNull(object)) {
             throw new SimpleException("Object must not be null");

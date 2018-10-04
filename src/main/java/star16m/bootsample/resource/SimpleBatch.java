@@ -17,13 +17,12 @@ public class SimpleBatch implements CommandLineRunner {
     }
     @Override
     public void run(String... args) throws Exception {
-        System.out.println("RUNNING at BatchTTT");
+        System.out.println("RUNNING at Batch");
 
         Team team = new Team();
         team.setId(2);
-        team.setName("롯데");
         team.setFullName("롯데 자이언츠");
-        team.setShortName("LOTTE");
+        team.setShortName("롯데");
         this.yagooService.save(team);
 
         List<Team> teams = this.yagooService.findAll();

@@ -8,7 +8,7 @@ import star16m.bootsample.resource.web.controller.annotations.SimpleRestControll
 public class PlayerController extends AbstractController<Player, Integer> {
     private PlayerService playerService;
     public PlayerController(PlayerService playerService) {
-        super("player", playerService, true);
+        super("player", playerService);
         this.playerService = playerService;
     }
 

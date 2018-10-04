@@ -1,90 +1,75 @@
 package star16m.bootsample.resource.web.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import star16m.bootsample.resource.entity.AbstractEntity;
 import star16m.bootsample.resource.service.AbstractService;
 import star16m.bootsample.resource.service.error.EntityNotfoundException;
-import star16m.bootsample.resource.service.error.SimpleException;
 import star16m.bootsample.resource.utils.SimpleUtil;
-import star16m.bootsample.resource.web.action.ResponseEntity;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
-public abstract class AbstractController<T extends AbstractEntity, I extends Integer> extends ResponseEntityExceptionHandler {
+public abstract class AbstractController<T extends AbstractEntity, ID extends Integer> extends ResponseEntityExceptionHandler {
     private Logger logger = LoggerFactory.getLogger(AbstractController.class);
-    private String resouceName;
-    private AbstractService<T, I> service;
-    private boolean exceptionThrowIfNotPresent = false;
-    public AbstractController(String resouceName, AbstractService<T, I> service) {
-        this(resouceName, service, false);
-    }
-    public AbstractController(String resouceName, AbstractService<T, I> service, boolean exceptionThrowIfNotPresent) {
-        this.resouceName = resouceName;
+    private String entityName;
+    private AbstractService<T, ID> service;
+    @Autowired
+    ObjectMapper objectMapper;
+    public AbstractController(String entityName, AbstractService<T, ID> service) {
+        this.entityName = entityName;
         this.service = service;
-        this.exceptionThrowIfNotPresent = exceptionThrowIfNotPresent;
     }
     @GetMapping
     public final ResponseEntity<List<T>> findAll() {
-        return SimpleUtil.response(this.service.findAll());
+        return ResponseEntity.ok(this.service.findAll());
     }
 
     @PostMapping
-    public final ResponseEntity<T> create(final T sourceObject) {
-        logger.debug("try create {} with [{}]", this.resouceName, sourceObject);
-        T createdObject = this.service.save(sourceObject);
-        return SimpleUtil.response(createdObject);
+    public final ResponseEntity<T> create(@RequestBody final T updateObject) {
+        SimpleUtil.mustNotNull(updateObject);
+        logger.debug("try create {} with [{}]", this.entityName, updateObject);
+        T createdObject = this.service.save(updateObject);
+        return ResponseEntity.ok(createdObject);
+    }
+
+
+    @PutMapping(path = "{id}")
+    public final ResponseEntity<T> update(@PathVariable final ID id, @RequestBody final Map<String, Object> newObjectMap) {
+        SimpleUtil.mustNotNull(id);
+        SimpleUtil.mustNotNull(newObjectMap);
+        SimpleUtil.mustMin(newObjectMap.keySet(), 1);
+        logger.debug("try update {} with id [{}] to [{}]", this.entityName, id, newObjectMap);
+        return ResponseEntity.ok(this.service.update(id, newObjectMap));
     }
 
     @GetMapping(value="/{id}")
-    public final ResponseEntity<T> get(@PathVariable final I id) {
-        logger.debug("try get {} with id [{}]", this.resouceName, id);
+    public final ResponseEntity<T> get(@PathVariable final ID id) {
+        logger.debug("try get {} with id [{}]", this.entityName, id);
         T object = getObject(id);
-        return SimpleUtil.response(object, SimpleUtil.isNotNull(object) ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
-    }
-
-    @PutMapping(value="/{id}")
-    public final ResponseEntity<T> update(@PathVariable final I id, final T targetObject) {
-        // validation check null and equals id
-        SimpleUtil.mustNotNull(id);
-        SimpleUtil.mustNotNull(targetObject);
-        SimpleUtil.mustEqual(id, targetObject.getId());
-        logger.debug("try update {} with id [{}] to [{}]", this.resouceName, id, targetObject);
-
-        // find
-        T sourceObject = getObject(id);
-        if (SimpleUtil.isNull(sourceObject)) {
-            SimpleUtil.response(null);
-        }
-        BeanUtils.copyProperties(sourceObject, targetObject);
-        logger.debug("merged {} [{}]", this.resouceName, sourceObject);
-
-        T updated = this.service.save(sourceObject);
-        logger.debug("updated {} : [{}]", this.resouceName, updated);
-
-        return SimpleUtil.response(updated);
+        return ResponseEntity.status(SimpleUtil.isNotNull(object) ? HttpStatus.OK : HttpStatus.BAD_REQUEST).body(object);
     }
 
     @DeleteMapping(value="/{id}")
-    public final ResponseEntity<Boolean> delete(@PathVariable final I id) {
+    public final ResponseEntity<Boolean> delete(@PathVariable final ID id) {
         this.service.delete(id);
-        return SimpleUtil.response(true);
+        return ResponseEntity.ok(true);
     }
 
-    private final T getObject(final I id) {
+    private final T getObject(final ID id) {
         Optional<T> optionalObject = this.service.findOne(id);
-        if (exceptionThrowIfNotPresent) {
-            return optionalObject.orElseThrow(() -> new EntityNotfoundException("not found object with id [{}].", id));
-        } else {
-            // return null
-            return optionalObject.orElse(null);
-        }
+        // return null
+        return optionalObject.orElse(null);
     }
 
     @ExceptionHandler(EntityNotfoundException.class)

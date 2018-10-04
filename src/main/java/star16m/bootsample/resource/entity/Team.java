@@ -6,6 +6,7 @@ import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Data
@@ -14,10 +15,18 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "tb_team")
-public class Team extends AbstractEntity {
+public class Team extends AbstractEntity<Integer> {
 
+    @Id
+    @Column(name = "id")
+    private Integer id;
     @Column(name = "full_name")
     private String fullName;
     @Column(name = "short_name")
     private String shortName;
+
+    @Override
+    public Integer getId() {
+        return id;
+    }
 }
