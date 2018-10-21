@@ -17,3 +17,10 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
+application:
+  scheduler:
+    thread:
+      name:
+        prefix: SAMPLE_SCHEDULER_THREAD
+    pool:
+      size: 10

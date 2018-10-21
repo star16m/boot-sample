@@ -15,11 +15,11 @@ import java.time.ZoneOffset;
 @EntityListeners(value = {AuditingEntityListener.class})
 @Getter
 @ToString
-public abstract class AbstractEntity<ID> {
+public abstract class AbstractEntity<I> {
     @Column(name = "create_date", updatable = false)
-    private LocalDateTime createDate = LocalDateTime.now();
+    private LocalDateTime createDate;
     @Column(name = "update_date")
-    private LocalDateTime updateDate = LocalDateTime.now();
+    private LocalDateTime updateDate;
 
     @PrePersist
     public void onPrePersist() {
@@ -30,5 +30,5 @@ public abstract class AbstractEntity<ID> {
     public void onPreUpdate() {
         this.updateDate = LocalDateTime.now(ZoneOffset.systemDefault());
     }
-    public abstract ID getId();
+    public abstract I getId();
 }

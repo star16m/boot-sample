@@ -13,7 +13,7 @@ public class TeamService extends AbstractService<Team, Integer> {
 
     @Override
     protected void patchedObject(Team o, Map<String, Object> map) {
-        if (map.containsKey("fullName")) o.setFullName((String)map.get("fullName"));
-        if (map.containsKey("shortName")) o.setShortName((String)map.get("shortName"));
+        if (map.containsKey("fullName")) o.setFullName((String) map.get("fullName"));
+        if (map.containsKey("shortName")) o.setShortName((String) map.get("shortName"));
     }
 }

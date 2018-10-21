@@ -28,5 +28,20 @@ public class BatchSampleApplicationTests {
 		Team team = response.getBody();
 		System.out.println(team);
 		assertThat(team.getShortName()).isEqualToIgnoringCase("롯데");
+
+		team.setShortName("롯데-updated");
+		ResponseEntity<Team> responseForPost = this.testRestTemplate.postForEntity("/api/rest/team/2", team, Team.class);
+		System.out.println(team);
+		assertThat(responseForPost.getBody().getShortName()).isEqualToIgnoringCase("롯데-updated");
+
+
+		ResponseEntity<Team> responseGet = this.testRestTemplate.getForEntity("/api/rest/team/2", Team.class);
+		assertThat(responseGet.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(responseGet.getBody()).isNotNull();
+		team = responseGet.getBody();
+		assertThat(team.getShortName()).isEqualToIgnoringCase("롯데-updated");
+
+		team.setShortName("롯데");
+		this.testRestTemplate.postForEntity("/api/rest/team/2", team, Team.class);
 	}
 }

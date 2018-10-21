@@ -5,5 +5,5 @@ import org.springframework.data.repository.NoRepositoryBean;
 import star16m.bootsample.resource.entity.AbstractEntity;
 
 @NoRepositoryBean
-public interface AbstractRepository<T extends AbstractEntity, ID> extends JpaRepository<T, ID> {
+public interface AbstractRepository<T extends AbstractEntity, I> extends JpaRepository<T, I> {
 }

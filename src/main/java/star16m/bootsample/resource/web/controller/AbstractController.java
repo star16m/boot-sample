@@ -1,11 +1,7 @@
 package star16m.bootsample.resource.web.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,19 +16,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public abstract class AbstractController<T extends AbstractEntity, ID extends Integer> extends ResponseEntityExceptionHandler {
+public abstract class AbstractController<T extends AbstractEntity, I extends Integer> extends ResponseEntityExceptionHandler {
     private Logger logger = LoggerFactory.getLogger(AbstractController.class);
     private String entityName;
-    private AbstractService<T, ID> service;
-    @Autowired
-    ObjectMapper objectMapper;
-    public AbstractController(String entityName, AbstractService<T, ID> service) {
+    private AbstractService<T, I> service;
+    public AbstractController(String entityName, AbstractService<T, I> service) {
         this.entityName = entityName;
         this.service = service;
     }
     @GetMapping
     public final ResponseEntity<List<T>> findAll() {
         return ResponseEntity.ok(this.service.findAll());
+    }
+
+    @GetMapping(value="/{id}")
+    public final ResponseEntity<T> findById(@PathVariable final I id) {
+        logger.debug("try get {} with id [{}]", this.entityName, id);
+        T object = getObject(id);
+        return ResponseEntity.ok(object);
     }
 
     @PostMapping
@@ -43,9 +44,8 @@ public abstract class AbstractController<T extends AbstractEntity, ID extends In
         return ResponseEntity.ok(createdObject);
     }
 
-
-    @PutMapping(path = "{id}")
-    public final ResponseEntity<T> update(@PathVariable final ID id, @RequestBody final Map<String, Object> newObjectMap) {
+    @PostMapping("{id}")
+    public final ResponseEntity<T> update(@PathVariable final I id, @RequestBody final Map<String, Object> newObjectMap) {
         SimpleUtil.mustNotNull(id);
         SimpleUtil.mustNotNull(newObjectMap);
         SimpleUtil.mustMin(newObjectMap.keySet(), 1);
@@ -53,27 +53,20 @@ public abstract class AbstractController<T extends AbstractEntity, ID extends In
         return ResponseEntity.ok(this.service.update(id, newObjectMap));
     }
 
-    @GetMapping(value="/{id}")
-    public final ResponseEntity<T> get(@PathVariable final ID id) {
-        logger.debug("try get {} with id [{}]", this.entityName, id);
-        T object = getObject(id);
-        return ResponseEntity.status(SimpleUtil.isNotNull(object) ? HttpStatus.OK : HttpStatus.BAD_REQUEST).body(object);
-    }
-
     @DeleteMapping(value="/{id}")
-    public final ResponseEntity<Boolean> delete(@PathVariable final ID id) {
+    public final ResponseEntity<Boolean> delete(@PathVariable final I id) {
         this.service.delete(id);
         return ResponseEntity.ok(true);
     }
 
-    private final T getObject(final ID id) {
+    private final T getObject(final I id) {
         Optional<T> optionalObject = this.service.findOne(id);
         // return null
         return optionalObject.orElse(null);
     }
 
     @ExceptionHandler(EntityNotfoundException.class)
-    public final org.springframework.http.ResponseEntity<String> handleUserNotFoundException(EntityNotfoundException ex, WebRequest request) {
-        return new org.springframework.http.ResponseEntity<>("not found entity", HttpStatus.NOT_FOUND);
+    public final ResponseEntity<String> handleUserNotFoundException(EntityNotfoundException e, WebRequest request) {
+        return new ResponseEntity<>("not found entity " + this.entityName, HttpStatus.NOT_FOUND);
     }
 }
