@@ -1,42 +1,171 @@
 package star16m.bootsample.resource.config;
 
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.*;
+import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.explore.support.MapJobExplorerFactoryBean;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
-import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.batch.core.launch.support.SimpleJobLauncher;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
+import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.database.JdbcBatchItemWriter;
+import org.springframework.batch.item.database.JdbcCursorItemReader;
+import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
+import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
+import org.springframework.batch.item.file.FlatFileItemWriter;
+import org.springframework.batch.item.file.builder.FlatFileItemWriterBuilder;
+import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.jdbc.core.ColumnMapRowMapper;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import star16m.bootsample.resource.service.action.Action;
+import star16m.bootsample.resource.service.action.ActionProvider;
+import star16m.bootsample.resource.service.action.ActionType;
+import star16m.bootsample.resource.service.error.EntityNotfoundException;
 
+import javax.sql.DataSource;
 import java.util.Map;
 
-@EnableBatchProcessing
 @Configuration
-@RequiredArgsConstructor
+@EnableBatchProcessing
 public class BatchConfiguration {
     private final Logger log = LoggerFactory.getLogger(BatchConfiguration.class);
+    private final DataSource dataSource;
+    private final NamedParameterJdbcTemplate jdbcTemplate;
+    private final ActionProvider actionProvider;
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
+    private final int chunkSize;
 
+    public BatchConfiguration(DataSource dataSource, NamedParameterJdbcTemplate jdbcTemplate, ActionProvider actionProvider, JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory, @Value("${spring.batch.chunksize:100}") int chunkSize) {
+        this.dataSource = dataSource;
+        this.jdbcTemplate = jdbcTemplate;
+        this.actionProvider = actionProvider;
+        this.jobBuilderFactory = jobBuilderFactory;
+        this.stepBuilderFactory = stepBuilderFactory;
+        this.chunkSize = chunkSize;
+    }
     @Bean
-    public Job simpleJob() {
-        return jobBuilderFactory.get("simpleJob")
-                .start(simpleStep1())
+    public DefaultBatchConfigurer batchConfigurer() {
+        return new DefaultBatchConfigurer() {
+
+            private JobRepository jobRepository;
+            private JobExplorer jobExplorer;
+            private JobLauncher jobLauncher;
+
+            {
+                MapJobRepositoryFactoryBean jobRepositoryFactory = new MapJobRepositoryFactoryBean();
+                try {
+                    this.jobRepository = jobRepositoryFactory.getObject();
+                    MapJobExplorerFactoryBean jobExplorerFactory = new MapJobExplorerFactoryBean(jobRepositoryFactory);
+                    this.jobExplorer = jobExplorerFactory.getObject();
+
+                    SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
+                    jobLauncher.setJobRepository(jobRepository);
+                    SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
+                    taskExecutor.setConcurrencyLimit(3);
+                    jobLauncher.setTaskExecutor(taskExecutor);
+                    // jobLauncher.afterPropertiesSet();
+                    this.jobLauncher = jobLauncher;
+
+                } catch (Exception e) {
+                }
+            }
+
+            @Override
+            public JobRepository getJobRepository() {
+                return jobRepository;
+            }
+
+            @Override
+            public JobExplorer getJobExplorer() {
+                return jobExplorer;
+            }
+
+            @Override
+            public JobLauncher getJobLauncher() {
+                return jobLauncher;
+            }
+        };
+    }
+    @Bean
+    public Job simpleJob(NamedParameterJdbcTemplate jdbcTemplate) {
+        return jobBuilderFactory.get("actionJob")
+                .start(actionStep(null))
                 .incrementer(new RunIdIncrementer())
                 .build();
     }
+    @Bean
+    @JobScope
+    public Step actionStep(@Value("#{jobParameters[actionName]}") String actionName) {
+        Action action = this.actionProvider.getAction(actionName).orElseThrow(() -> new EntityNotfoundException(actionName));
+        log.debug("action step as [{}]", action);
+        ItemWriter writer = null;
+        switch (action.getWriteType()) {
+            case csv:
+                writer = writerWithFile(actionName);
+                break;
+            case db:
+                writer = writerWithJdbc(actionName);
+                break;
+            default:
+        }
+        return stepBuilderFactory
+                .get("actionStep")
+                .<Map<String, Object>, Map<String, Object>>chunk(this.chunkSize)
+                .reader(reader(actionName))
+                .writer(writer)
+                .build();
+    }
+    @Bean
+    @StepScope
+    public JdbcCursorItemReader<Map<String, Object>> reader(@Value("#{jobParameters[actionName]}") String actionName) {
+        Action action = this.actionProvider.getAction(actionName).orElseThrow(() -> new EntityNotfoundException(actionName));
+        return new JdbcCursorItemReaderBuilder<Map<String, Object>>()
+                .fetchSize(this.chunkSize)
+                .dataSource(this.dataSource)
+                .sql(action.getReadDetail())
+                .rowMapper(new ColumnMapRowMapper())
+                .name("actionItemWriterWithJdbc")
+                .build();
+    }
 
-    public Step simpleStep1() {
-        return stepBuilderFactory.get("simpleStep1")
-                .tasklet((contribution, chunkContext) -> {
-                    Map<String, Object> parameters = chunkContext.getStepContext().getJobParameters();
-                    parameters.keySet().forEach(k -> System.out.println(String.format("key[{}], value[{}]", k, parameters.get(k))));
-                    return RepeatStatus.FINISHED;
+    @Bean
+    @StepScope
+    public JdbcBatchItemWriter<Map<String, Object>> writerWithJdbc(@Value("#{jobParameters[actionName]}") String actionName) {
+        Action action = this.actionProvider.getAction(actionName).orElseThrow(() -> new EntityNotfoundException(actionName));
+        return new JdbcBatchItemWriterBuilder<Map<String, Object>>()
+                .columnMapped()
+                .dataSource(dataSource)
+                .sql(action.getWriteDetail())
+                .build();
+    }
+
+    @Bean
+    @StepScope
+    public FlatFileItemWriter<Map<String, Object>> writerWithFile(@Value("#{jobParameters[actionName]}") String actionName) {
+        Action action = this.actionProvider.getAction(actionName).orElseThrow(() -> new EntityNotfoundException(actionName));
+        return new FlatFileItemWriterBuilder<Map<String, Object>>()
+                .name("actionItemWriterWithFile")
+                .resource(new FileSystemResource(action.getWriteDetail()))
+                .lineAggregator(new DelimitedLineAggregator<Map<String, Object>>() {
+                    {
+                        setDelimiter(",");
+                        setFieldExtractor(integerIntegerMap -> {
+                            Map.Entry<String, Object> next = integerIntegerMap.entrySet().iterator().next();
+                            return new Object[]{next.getKey(), next.getValue()};
+                        });
+                    }
                 })
                 .build();
     }

@@ -11,12 +11,12 @@ public class ActionProvider {
 
     public ActionProvider() {
         this.actionMap = new HashMap<>();
-        ActionParameter actionParameter1 = new ActionParameter("i_param1", true);
-        ActionParameter actionParameter2 = new ActionParameter("i_param2", false);
 
-        addAction(new Action("action-1", "sp_action_1()"));
-        addAction(new Action("action-2", "sp_action_2(i_param1 := :i_param1)", actionParameter1));
-        addAction(new Action("action-3", "sp_action_3(i_param1 := :i_param1, i_param2 := :i_param2)", actionParameter1, actionParameter2));
+        addAction(new Action("action-1", ActionType.db, "select id, name, full_name, short_name, create_date, update_date from tb_team", ActionType.db, "insert into tb_team_history(id, name, full_name, short_name, create_date, update_date) values (:id, :name, :full_name, :short_name, :create_date, :update_date)"));
+        addAction(new Action("action-2", ActionType.db, "select name, count(name) as team_cnt from tb_team_history group by name", ActionType.db, "insert into tb_team_cnt(name, team_cnt) values (:name, :team_cnt)"));
+        addAction(new Action("action-3", ActionType.db, "select id, name, full_name, short_name, create_date, update_date from tb_team", ActionType.csv, "/Users/star16m/Downloads/team.csv"));
+        addAction(new Action("action-4", ActionType.db, "select name, count(name) as team_cnt from tb_team_history group by name", ActionType.csv, "/Users/star16m/Downloads/team_cnt.csv"));
+
     }
 
     public void addAction(final Action action) {
@@ -32,11 +32,4 @@ public class ActionProvider {
         return new ArrayList<>(this.actionMap.values());
     }
 
-    public boolean isValidParameters(final Action action, final Map<String, Object> parameterMap) {
-        SimpleUtil.mustNotNull(action);
-        SimpleUtil.mustNotNull(action.getActionName());
-        SimpleUtil.mustNotNull(action.getActionDetail());
-        boolean invalidResult = action.getActionParameterList().stream().filter(p -> p.getRequired()).filter(p -> !parameterMap.containsKey(p.getParameterName())).findAny().isPresent();
-        return !invalidResult;
-    }
 }

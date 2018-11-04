@@ -2,12 +2,21 @@ logging:
   level:
     star16m: DEBUG
 spring:
+  # datasource
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/
     username: postgres
     password: postgres
-
+  batch:
+    # 초기 기동 시에 스키마 작성 여부
+    initializer:
+      enabled: false
+    # 초기 기동 시에 배치 실행 여부
+    job:
+      enabled: false
+    # 커스텀 chunk size
+    chunksize: 100
   jackson:
     serialization:
       WRITE_DATES_AS_TIMESTAMPS: false
@@ -18,6 +27,7 @@ spring:
           lob:
             non_contextual_creation: true
 application:
+  # scheduler 설정
   scheduler:
     thread:
       name:

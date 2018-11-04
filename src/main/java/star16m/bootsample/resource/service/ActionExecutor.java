@@ -17,7 +17,7 @@ public class ActionExecutor {
     }
 
     public List<Map<String, Object>> getList(Action action, Map<String, Object> parameters) {
-        return this.namedParameterJdbcTemplate.queryForList(String.format(NAMED_QUERY_SELECT, action.getActionDetail()), parameters);
+        return this.namedParameterJdbcTemplate.queryForList(String.format(NAMED_QUERY_SELECT, action.getReadDetail()), parameters);
     }
 
 }

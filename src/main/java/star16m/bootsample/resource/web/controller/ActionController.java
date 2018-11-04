@@ -46,9 +46,6 @@ public class ActionController {
             throw new SimpleRequestException(errorMessage);
         }
         Action action = this.actionProvider.getAction(actionRequest.getActionName()).orElseThrow(() -> new EntityNotfoundException(actionRequest.getActionName()));
-        if (!this.actionProvider.isValidParameters(action, actionRequest.getActionParameter())) {
-            throw new SimpleRequestException(String.format("Required parameters [%s] is not specified for Action [%s]", action.getRequiredActionParameter(), action.getActionName()));
-        }
         log.debug("action [{}], param [{}]", action.getActionName(), actionRequest.getActionParameter());
         return this.actionExecutor.getList(action, actionRequest.getActionParameter());
     }

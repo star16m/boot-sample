@@ -6,25 +6,26 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 public class Action implements Serializable {
     @NotNull @NotEmpty @Size(min = 3, max = 20)
     private String actionName;
+    @NotNull
+    private ActionType readType;
     @NotNull @NotEmpty @Size(min = 3, max = 255)
-    private String actionDetail;
-    private List<ActionParameter> actionParameterList;
+    private String readDetail;
+    @NotNull
+    private ActionType writeType;
+    @NotNull @NotEmpty @Size(min = 3, max = 255)
+    private String writeDetail;
 
-    public Action(String actionName, String actionDetail, ActionParameter... actionParameterArray) {
+
+    public Action(String actionName, ActionType readType, String readDetail, ActionType writeType, String writeDetail) {
         this.actionName = actionName;
-        this.actionDetail = actionDetail;
-        this.actionParameterList = Arrays.asList(actionParameterArray);
-    }
-
-    public List<ActionParameter> getRequiredActionParameter() {
-        return this.actionParameterList.stream().filter(p -> p.getRequired()).collect(Collectors.toList());
+        this.readType = readType;
+        this.readDetail = readDetail;
+        this.writeType = writeType;
+        this.writeDetail = writeDetail;
     }
 }
