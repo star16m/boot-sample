@@ -16,6 +16,7 @@ public class ActionProvider {
         addAction(new Action("action-2", ActionType.db, "select name, count(name) as team_cnt from tb_team_history group by name", ActionType.db, "insert into tb_team_cnt(name, team_cnt) values (:name, :team_cnt)"));
         addAction(new Action("action-3", ActionType.db, "select id, name, full_name, short_name, create_date, update_date from tb_team", ActionType.csv, "/Users/star16m/Downloads/team.csv"));
         addAction(new Action("action-4", ActionType.db, "select name, count(name) as team_cnt from tb_team_history group by name", ActionType.csv, "/Users/star16m/Downloads/team_cnt.csv"));
+        addAction(new Action("action-5", ActionType.csv, "/Users/star16m/Downloads/team_cnt.csv", ActionType.db, "insert into tb_team_cnt2(name, team_cnt) values (:name, :team_cnt)", "name", "team_cnt"));
 
     }
 

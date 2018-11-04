@@ -12,14 +12,19 @@ import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
+import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
+import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.FlatFileItemWriter;
+import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.batch.item.file.builder.FlatFileItemWriterBuilder;
+import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
+import org.springframework.batch.item.file.transform.PassThroughFieldExtractor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,7 +39,9 @@ import star16m.bootsample.resource.service.action.ActionType;
 import star16m.bootsample.resource.service.error.EntityNotfoundException;
 
 import javax.sql.DataSource;
+import java.nio.charset.Charset;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Configuration
 @EnableBatchProcessing
@@ -110,7 +117,13 @@ public class BatchConfiguration {
     public Step actionStep(@Value("#{jobParameters[actionName]}") String actionName) {
         Action action = this.actionProvider.getAction(actionName).orElseThrow(() -> new EntityNotfoundException(actionName));
         log.debug("action step as [{}]", action);
-        ItemWriter writer = null;
+        ItemReader<Map<String, Object>> reader = null;
+        switch (action.getReadType()) {
+            case csv: reader = readerWithFile(actionName); break;
+            case db : reader = readerWithDb(actionName); break;
+            default:
+        }
+        ItemWriter<Map<String, Object>> writer = null;
         switch (action.getWriteType()) {
             case csv:
                 writer = writerWithFile(actionName);
@@ -123,13 +136,13 @@ public class BatchConfiguration {
         return stepBuilderFactory
                 .get("actionStep")
                 .<Map<String, Object>, Map<String, Object>>chunk(this.chunkSize)
-                .reader(reader(actionName))
+                .reader(reader)
                 .writer(writer)
                 .build();
     }
-    @Bean
+    @Bean(destroyMethod="")
     @StepScope
-    public JdbcCursorItemReader<Map<String, Object>> reader(@Value("#{jobParameters[actionName]}") String actionName) {
+    public JdbcCursorItemReader<Map<String, Object>> readerWithDb(@Value("#{jobParameters[actionName]}") String actionName) {
         Action action = this.actionProvider.getAction(actionName).orElseThrow(() -> new EntityNotfoundException(actionName));
         return new JdbcCursorItemReaderBuilder<Map<String, Object>>()
                 .fetchSize(this.chunkSize)
@@ -158,15 +171,27 @@ public class BatchConfiguration {
         return new FlatFileItemWriterBuilder<Map<String, Object>>()
                 .name("actionItemWriterWithFile")
                 .resource(new FileSystemResource(action.getWriteDetail()))
+                .encoding("UTF-8")
+                .shouldDeleteIfExists(true)
                 .lineAggregator(new DelimitedLineAggregator<Map<String, Object>>() {
                     {
                         setDelimiter(",");
-                        setFieldExtractor(integerIntegerMap -> {
-                            Map.Entry<String, Object> next = integerIntegerMap.entrySet().iterator().next();
-                            return new Object[]{next.getKey(), next.getValue()};
-                        });
+                        // setFieldExtractor(map -> map.keySet().stream().map(k -> map.get(k)).collect(Collectors.toList()).toArray());
                     }
                 })
+                .build();
+    }
+
+    @Bean(destroyMethod="")
+    @StepScope
+    public FlatFileItemReader<Map<String, Object>> readerWithFile(@Value("#{jobParameters[actionName]}") String actionName) {
+        Action action = this.actionProvider.getAction(actionName).orElseThrow(() -> new EntityNotfoundException(actionName));
+        return new FlatFileItemReaderBuilder<Map<String, Object>>()
+                .name("actionItemReaderWithFile")
+                .resource(new FileSystemResource(action.getReadDetail()))
+                .encoding("UTF-8")
+                .fieldSetMapper(new BeanWrapperFieldSetMapper<>())
+                .delimited().delimiter(",").names(action.getColumns())
                 .build();
     }
 }

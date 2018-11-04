@@ -19,13 +19,14 @@ public class Action implements Serializable {
     private ActionType writeType;
     @NotNull @NotEmpty @Size(min = 3, max = 255)
     private String writeDetail;
-
-
-    public Action(String actionName, ActionType readType, String readDetail, ActionType writeType, String writeDetail) {
+    private String[] columns;
+    
+    public Action(String actionName, ActionType readType, String readDetail, ActionType writeType, String writeDetail, String...columns) {
         this.actionName = actionName;
         this.readType = readType;
         this.readDetail = readDetail;
         this.writeType = writeType;
         this.writeDetail = writeDetail;
+        this.columns = columns;
     }
 }
