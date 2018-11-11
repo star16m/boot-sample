@@ -1,5 +1,6 @@
 package star16m.bootsample.resource.web.controller;
 
+import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @SimpleRestController(path="/api/rest/action")
+@Api(tags = "Action")
 public class ActionController {
     private static final Logger log = LoggerFactory.getLogger(ActionController.class);
     private final ActionProvider actionProvider;
