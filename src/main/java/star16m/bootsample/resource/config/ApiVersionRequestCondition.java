@@ -24,6 +24,7 @@ public class ApiVersionRequestCondition implements RequestCondition<ApiVersionRe
         }
 
         public ApiVersionRequestCondition getMatchingCondition(HttpServletRequest request) {
+            System.out.println("----->>>" + request.getRequestURI());
             Matcher m = VERSION_PREFIX_PATTERN.matcher(request.getRequestURI());
             if (m.find()) {
                 Integer version = Integer.valueOf(m.group(1));

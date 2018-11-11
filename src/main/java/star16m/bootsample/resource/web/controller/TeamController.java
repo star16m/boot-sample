@@ -17,6 +17,4 @@ public class TeamController extends AbstractController<Team, Integer> {
         super(Resource.TEAM, teamService);
         this.teamService = teamService;
     }
-
-    // customize
 }

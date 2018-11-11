@@ -1,30 +1,23 @@
 package star16m.bootsample.resource.config;
 
 import org.springframework.boot.autoconfigure.web.servlet.WebMvcRegistrations;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpMethod;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
 import org.springframework.web.servlet.mvc.condition.RequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-import springfox.documentation.spring.web.WebMvcRequestHandler;
-import star16m.bootsample.resource.web.controller.PlayerController;
 import star16m.bootsample.resource.web.controller.annotations.ApiVersion;
 import star16m.bootsample.resource.web.controller.annotations.SimpleRestController;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 @Configuration
@@ -45,6 +38,26 @@ public class WebMvcConfiguration implements WebMvcConfigurer, WebMvcRegistration
 
     private static class ApiAwareRequestMappingHandlerMapping extends RequestMappingHandlerMapping {
 
+        @Override
+        protected void registerHandlerMethod(Object handler, Method method, RequestMappingInfo mapping) {
+            Class<?> handlerType = handler instanceof String ? this.obtainApplicationContext().getType((String)handler) : handler.getClass();
+            SimpleRestController restController = AnnotatedElementUtils.findMergedAnnotation(handlerType, SimpleRestController.class);
+            if (!Objects.isNull(restController)) {
+                RequestMapping requestMapping = AnnotatedElementUtils.findMergedAnnotation(method, RequestMapping.class);
+                AtomicBoolean isSupported = new AtomicBoolean(true);
+                System.out.println("this is supported method " + method + ", controller" + restController);
+//                Arrays.asList(restController.supportedMethod()).stream().filter(m -> {
+//////                    isSupported.set(false);
+//////                });
+                if (handler.toString().contains("team") && method.getName().contains("findAll")) {
+                    isSupported.set(false);
+                }
+                if (!isSupported.get()) {
+                    return;
+                }
+            }
+            super.registerHandlerMethod(handler, method, mapping);
+        }
 
         @Override
         protected RequestCondition<ApiVersionRequestCondition> getCustomTypeCondition(Class<?> handlerType) {

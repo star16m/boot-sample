@@ -54,6 +54,7 @@ public class SwaggerConfiguration {
         return new ApiInfoBuilder()
                 .title("spring boot swagger2")
                 .description("swagger2 sample")
+                .version("1.0")
                 .build();
 
     }
