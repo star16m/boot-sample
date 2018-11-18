@@ -35,11 +35,11 @@ public class SwaggerConfiguration {
 
     private List<ResponseMessage> getResponseMessageList() {
         List<ResponseMessage> responseMessages = new ArrayList<>();
-        responseMessages.add(new ResponseMessageBuilder()
-                .code(500)
-                .message("Internal Server Error")
-                .responseModel(new ModelRef("Error"))
-                .build());
+//        responseMessages.add(new ResponseMessageBuilder()
+//                .code(500)
+//                .message("Internal Server Error")
+//                .responseModel(new ModelRef("Error"))
+//                .build());
         responseMessages.add(new ResponseMessageBuilder()
                 .code(400)
                 .message("Bad Request")

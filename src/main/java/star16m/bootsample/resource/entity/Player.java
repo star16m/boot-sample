@@ -12,7 +12,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "tb_player")
-public class Player extends AbstractEntity<Integer> {
+public class Player extends BaseEntity<Integer> {
     @Id
     @Column(name = "id")
     private Integer id;

@@ -9,25 +9,28 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import star16m.bootsample.resource.Resource;
-import star16m.bootsample.resource.entity.AbstractEntity;
-import star16m.bootsample.resource.service.AbstractService;
+import star16m.bootsample.resource.entity.BaseEntity;
+import star16m.bootsample.resource.service.BaseService;
 import star16m.bootsample.resource.service.error.EntityNotfoundException;
 import star16m.bootsample.resource.utils.SimpleUtil;
+import star16m.bootsample.resource.web.controller.annotations.SimpleRestMethod;
+import star16m.bootsample.resource.web.controller.annotations.SimpleRestMethodMapping;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public abstract class AbstractController<T extends AbstractEntity, I extends Integer> extends ResponseEntityExceptionHandler {
-    private Logger logger = LoggerFactory.getLogger(AbstractController.class);
+public abstract class BaseController<T extends BaseEntity, I extends Integer> extends ResponseEntityExceptionHandler {
+    private Logger logger = LoggerFactory.getLogger(BaseController.class);
     private Resource resource;
-    private AbstractService<T, I> service;
-    public AbstractController(Resource resource, AbstractService<T, I> service) {
+    private BaseService<T, I> service;
+    public BaseController(Resource resource, BaseService<T, I> service) {
         this.resource = resource;
         this.service = service;
     }
     @ApiOperation(value = "전체 목록 조회")
     @GetMapping
+    @SimpleRestMethodMapping(SimpleRestMethod.FIND_ALL)
     public final ResponseEntity<List<T>> findAll() {
         System.out.println("this is findAll");
         return ResponseEntity.ok(this.service.findAll());
@@ -35,6 +38,7 @@ public abstract class AbstractController<T extends AbstractEntity, I extends Int
 
     @ApiOperation(value = "상세 조회")
     @GetMapping(value="/{id}")
+    @SimpleRestMethodMapping(SimpleRestMethod.FIND_ONE)
     public final ResponseEntity<T> findById(@PathVariable final I id) {
         logger.debug("try get {} with id [{}]", this.resource, id);
         T object = getObject(id);
@@ -43,6 +47,7 @@ public abstract class AbstractController<T extends AbstractEntity, I extends Int
 
     @ApiOperation(value = "생성")
     @PostMapping
+    @SimpleRestMethodMapping(SimpleRestMethod.CREATE)
     public final ResponseEntity<T> create(@RequestBody final T updateObject) {
         SimpleUtil.mustNotNull(updateObject);
         logger.debug("try create {} with [{}]", this.resource.getDescription(), updateObject);
@@ -52,6 +57,7 @@ public abstract class AbstractController<T extends AbstractEntity, I extends Int
 
     @ApiOperation(value = "갱신")
     @PostMapping("{id}")
+    @SimpleRestMethodMapping(SimpleRestMethod.UPDATE)
     public final ResponseEntity<T> update(@PathVariable final I id, @RequestBody final Map<String, Object> newObjectMap) {
         SimpleUtil.mustNotNull(id);
         SimpleUtil.mustNotNull(newObjectMap);
@@ -59,8 +65,10 @@ public abstract class AbstractController<T extends AbstractEntity, I extends Int
         logger.debug("try update {} with id [{}] to [{}]", this.resource.getDescription(), id, newObjectMap);
         return ResponseEntity.ok(this.service.update(id, newObjectMap));
     }
+
     @ApiOperation(value = "삭제")
     @DeleteMapping(value="/{id}")
+    @SimpleRestMethodMapping(SimpleRestMethod.DELETE)
     public final ResponseEntity<Boolean> delete(@PathVariable final I id) {
         this.service.delete(id);
         return ResponseEntity.ok(true);

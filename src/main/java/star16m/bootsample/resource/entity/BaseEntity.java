@@ -15,7 +15,7 @@ import java.time.ZoneOffset;
 @EntityListeners(value = {AuditingEntityListener.class})
 @Getter
 @ToString
-public abstract class AbstractEntity<I> {
+public abstract class BaseEntity<I> {
     @Column(name = "create_date", updatable = false)
     private LocalDateTime createDate;
     @Column(name = "update_date")

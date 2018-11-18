@@ -13,9 +13,16 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @RestController
-@RequestMapping(value = "" )
+@RequestMapping(value = "")
 public @interface SimpleRestController {
     @AliasFor(annotation = RequestMapping.class)
     String path();
-    HttpMethod[] supportedMethod() default {};
+
+    SimpleRestMethod[] supportedMethod() default {
+            SimpleRestMethod.FIND_ALL,
+            SimpleRestMethod.FIND_ONE,
+            SimpleRestMethod.CREATE,
+            SimpleRestMethod.DELETE,
+            SimpleRestMethod.UPDATE,
+    };
 }

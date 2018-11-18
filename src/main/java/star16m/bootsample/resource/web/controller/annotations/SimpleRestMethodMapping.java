@@ -7,11 +7,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(value = {ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ApiVersion {
-    @AliasFor("supported")
-    int value() default 1;
-    @AliasFor("value")
-    int supported() default 1;
+@Target(ElementType.METHOD)
+public @interface SimpleRestMethodMapping {
+
+    SimpleRestMethod value();
 }

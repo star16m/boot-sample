@@ -1,6 +1,6 @@
 package star16m.bootsample.resource.service;
 
-import star16m.bootsample.resource.entity.AbstractEntity;
+import star16m.bootsample.resource.entity.BaseEntity;
 import star16m.bootsample.resource.service.error.EntityNotfoundException;
 import star16m.bootsample.resource.service.error.SimpleException;
 import star16m.bootsample.resource.utils.SimpleUtil;
@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public abstract class AbstractService<T extends AbstractEntity, I> {
-    private AbstractRepository<T, I> simpleRepository;
+public abstract class BaseService<T extends BaseEntity, I> {
+    private BaseRepository<T, I> simpleRepository;
 
-    public AbstractService(AbstractRepository simpleRepository) {
+    public BaseService(BaseRepository simpleRepository) {
         this.simpleRepository = simpleRepository;
     }
 

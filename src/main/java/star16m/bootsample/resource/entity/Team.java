@@ -15,7 +15,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "tb_team")
-public class Team extends AbstractEntity<Integer> {
+public class Team extends BaseEntity<Integer> {
 
     @Id
     @Column(name = "id")

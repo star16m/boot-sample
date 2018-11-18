@@ -6,7 +6,7 @@ import star16m.bootsample.resource.entity.Player;
 import java.util.Map;
 
 @Component
-public class PlayerService extends AbstractService<Player, Integer> {
+public class PlayerService extends BaseService<Player, Integer> {
     public PlayerService(PlayerRepository playerRepository) {
         super(playerRepository);
     }

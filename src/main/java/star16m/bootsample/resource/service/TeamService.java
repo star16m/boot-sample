@@ -6,7 +6,7 @@ import star16m.bootsample.resource.entity.Team;
 import java.util.Map;
 
 @Component
-public class TeamService extends AbstractService<Team, Integer> {
+public class TeamService extends BaseService<Team, Integer> {
     public TeamService(TeamRepository teamRepository) {
         super(teamRepository);
     }
