@@ -13,7 +13,6 @@ import javax.persistence.Table;
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-
 @Entity
 @Table(name = "tb_player")
 public class Player extends BaseEntity<Integer> {
