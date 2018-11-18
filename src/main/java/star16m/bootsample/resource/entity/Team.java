@@ -1,5 +1,6 @@
 package star16m.bootsample.resource.entity;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -19,6 +20,7 @@ public class Team extends BaseEntity<Integer> {
 
     @Id
     @Column(name = "id")
+    @ApiModelProperty(notes = "팀의 key ID")
     private Integer id;
     @Column(name = "full_name")
     private String fullName;

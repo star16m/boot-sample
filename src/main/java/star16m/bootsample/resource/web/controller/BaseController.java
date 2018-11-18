@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
@@ -46,7 +47,7 @@ public abstract class BaseController<T extends BaseEntity, I extends Integer> ex
     }
 
     @ApiOperation(value = "생성")
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @SimpleRestMethodMapping(SimpleRestMethod.CREATE)
     public final ResponseEntity<T> create(@RequestBody final T updateObject) {
         SimpleUtil.mustNotNull(updateObject);
@@ -56,7 +57,7 @@ public abstract class BaseController<T extends BaseEntity, I extends Integer> ex
     }
 
     @ApiOperation(value = "갱신")
-    @PostMapping("{id}")
+    @PostMapping(value = "{id}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @SimpleRestMethodMapping(SimpleRestMethod.UPDATE)
     public final ResponseEntity<T> update(@PathVariable final I id, @RequestBody final Map<String, Object> newObjectMap) {
         SimpleUtil.mustNotNull(id);
@@ -67,14 +68,14 @@ public abstract class BaseController<T extends BaseEntity, I extends Integer> ex
     }
 
     @ApiOperation(value = "삭제")
-    @DeleteMapping(value="/{id}")
+    @DeleteMapping(value="/{id}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @SimpleRestMethodMapping(SimpleRestMethod.DELETE)
     public final ResponseEntity<Boolean> delete(@PathVariable final I id) {
         this.service.delete(id);
         return ResponseEntity.ok(true);
     }
 
-    private final T getObject(final I id) {
+    private T getObject(final I id) {
         Optional<T> optionalObject = this.service.findOne(id);
         // return null
         return optionalObject.orElse(null);
