@@ -13,6 +13,6 @@ public class PlayerService extends BaseService<Player, Integer> {
 
     @Override
     protected void patchedObject(Player o, Map<String, Object> map) {
-        if (map.containsKey("backnumber")) o.setBackNumber((Integer)map.get("backnumber"));
+        if (map.containsKey("backnumber")) o.setBackNumber((String) map.get("backnumber"));
     }
 }

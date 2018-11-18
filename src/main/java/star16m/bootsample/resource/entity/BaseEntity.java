@@ -1,5 +1,6 @@
 package star16m.bootsample.resource.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,8 +17,10 @@ import java.time.ZoneOffset;
 @Getter
 @ToString
 public abstract class BaseEntity<I> {
+    @JsonIgnore
     @Column(name = "create_date", updatable = false)
     private LocalDateTime createDate;
+    @JsonIgnore
     @Column(name = "update_date")
     private LocalDateTime updateDate;
 

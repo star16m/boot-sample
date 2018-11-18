@@ -5,9 +5,8 @@ import star16m.bootsample.resource.Resource;
 import star16m.bootsample.resource.entity.Player;
 import star16m.bootsample.resource.service.PlayerService;
 import star16m.bootsample.resource.web.controller.annotations.SimpleRestController;
-import star16m.bootsample.resource.web.controller.annotations.SimpleRestMethod;
 
-@SimpleRestController(path = "/api/rest/v1/player", supportedMethod = {SimpleRestMethod.FIND_ALL})
+@SimpleRestController(path = "/api/rest/v1/player")
 @Api(tags = { "Player" })
 public class PlayerController extends BaseController<Player, Integer> {
     private PlayerService playerService;

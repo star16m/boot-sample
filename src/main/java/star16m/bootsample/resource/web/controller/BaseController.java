@@ -25,7 +25,7 @@ public abstract class BaseController<T extends BaseEntity, I extends Integer> ex
     private Logger logger = LoggerFactory.getLogger(BaseController.class);
     private Resource resource;
     private BaseService<T, I> service;
-    public BaseController(Resource resource, BaseService<T, I> service) {
+    BaseController(Resource resource, BaseService<T, I> service) {
         this.resource = resource;
         this.service = service;
     }
@@ -49,10 +49,10 @@ public abstract class BaseController<T extends BaseEntity, I extends Integer> ex
     @ApiOperation(value = "생성")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @SimpleRestMethodMapping(SimpleRestMethod.CREATE)
-    public final ResponseEntity<T> create(@RequestBody final T updateObject) {
-        SimpleUtil.mustNotNull(updateObject);
-        logger.debug("try create {} with [{}]", this.resource.getDescription(), updateObject);
-        T createdObject = this.service.save(updateObject);
+    public final ResponseEntity<T> create(@RequestBody final T createObject) {
+        SimpleUtil.mustNotNull(createObject);
+        logger.debug("try create {} with [{}]", this.resource.getDescription(), createObject);
+        T createdObject = this.service.save(createObject);
         return ResponseEntity.ok(createdObject);
     }
 
