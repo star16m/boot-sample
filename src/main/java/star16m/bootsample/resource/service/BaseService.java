@@ -39,7 +39,7 @@ public abstract class BaseService<T extends BaseEntity, I> {
         return simpleRepository.findById(id)
                 .map(o -> {
                     patchedObject(o, map);
-                    return simpleRepository.save(o);
+                    return simpleRepository.saveAndFlush(o);
                 })
                 .orElseThrow(() -> new EntityNotfoundException(id.toString()));
     }

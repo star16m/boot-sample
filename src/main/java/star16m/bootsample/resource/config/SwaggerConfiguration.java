@@ -7,7 +7,6 @@ import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.builders.ResponseMessageBuilder;
-import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.ResponseMessage;
 import springfox.documentation.spi.DocumentationType;
@@ -22,15 +21,31 @@ import java.util.List;
 public class SwaggerConfiguration {
 
     @Bean
-    public Docket api() {
+    public Docket getV0Swagger() {
+        return getSwagger("TBD", "v0.1");
+    }
+    @Bean
+    public Docket getV1Swagger() {
+        return getSwagger("확정", "v1");
+    }
+    private Docket getSwagger(String groupName, String version) {
         return new Docket(DocumentationType.SWAGGER_2)
-                .apiInfo(apiInfo())
+                .apiInfo(apiInfo(version))
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("star16m"))
-                .paths(PathSelectors.any())
+                .paths(PathSelectors.ant("/**/" + version + "/**"))
                 .build()
+                .groupName(groupName)
                 .useDefaultResponseMessages(false)
-                .globalResponseMessage(RequestMethod.GET, getResponseMessageList());
+//                .globalResponseMessage(RequestMethod.GET, getResponseMessageList())
+                ;
+    }
+    private ApiInfo apiInfo(String version) {
+        return new ApiInfoBuilder()
+                .title("spring boot swagger2")
+                .description("swagger2 sample")
+                .version(version)
+                .build();
     }
 
     private List<ResponseMessage> getResponseMessageList() {
@@ -49,13 +64,5 @@ public class SwaggerConfiguration {
                 .message("Not Found")
                 .build());
         return responseMessages;
-    }
-    private ApiInfo apiInfo() {
-        return new ApiInfoBuilder()
-                .title("spring boot swagger2")
-                .description("swagger2 sample")
-                .version("1.0")
-                .build();
-
     }
 }

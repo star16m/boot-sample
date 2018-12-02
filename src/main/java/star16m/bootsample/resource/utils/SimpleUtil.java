@@ -37,4 +37,10 @@ public class SimpleUtil {
             throw new SimpleException("Objects must be equals. a=[{}], b=[{}]", a, b);
         }
     }
+    public static String getString(String message, String defaultMessage) {
+        if (isNull(message) || message.isEmpty()) {
+            return defaultMessage;
+        }
+        return message;
+    }
 }

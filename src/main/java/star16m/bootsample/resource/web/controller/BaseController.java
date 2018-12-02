@@ -64,7 +64,9 @@ public abstract class BaseController<T extends BaseEntity, I extends Integer> ex
         SimpleUtil.mustNotNull(newObjectMap);
         SimpleUtil.mustMin(newObjectMap.keySet(), 1);
         logger.debug("try update {} with id [{}] to [{}]", this.resource.getDescription(), id, newObjectMap);
-        return ResponseEntity.ok(this.service.update(id, newObjectMap));
+        T updatedEntity = this.service.update(id, newObjectMap);
+        logger.debug("updated with [{}]", updatedEntity);
+        return ResponseEntity.ok(updatedEntity);
     }
 
     @ApiOperation(value = "삭제")

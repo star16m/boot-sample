@@ -14,7 +14,7 @@ import javax.persistence.Table;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "tb_team")
+@Table(name = "tb_team_test")
 public class Team extends BaseEntity<Integer> {
 
     @Id

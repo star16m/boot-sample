@@ -22,7 +22,7 @@ public class BatchSampleApplicationTests {
 	@Test
 	public void testWith() {
 
-		ResponseEntity<Team> response = testRestTemplate.getForEntity("/api/rest/team/2", Team.class);
+		ResponseEntity<Team> response = testRestTemplate.getForEntity("/api/v1/rest/team/2", Team.class);
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(response.getBody()).isNotNull();
 		Team team = response.getBody();
@@ -30,18 +30,18 @@ public class BatchSampleApplicationTests {
 		assertThat(team.getShortName()).isEqualToIgnoringCase("롯데");
 
 		team.setShortName("롯데-updated");
-		ResponseEntity<Team> responseForPost = this.testRestTemplate.postForEntity("/api/rest/team/2", team, Team.class);
+		ResponseEntity<Team> responseForPost = this.testRestTemplate.postForEntity("/api/v1/rest/team/2", team, Team.class);
 		System.out.println(team);
 		assertThat(responseForPost.getBody().getShortName()).isEqualToIgnoringCase("롯데-updated");
 
 
-		ResponseEntity<Team> responseGet = this.testRestTemplate.getForEntity("/api/rest/team/2", Team.class);
+		ResponseEntity<Team> responseGet = this.testRestTemplate.getForEntity("/api/v1/rest/team/2", Team.class);
 		assertThat(responseGet.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(responseGet.getBody()).isNotNull();
 		team = responseGet.getBody();
 		assertThat(team.getShortName()).isEqualToIgnoringCase("롯데-updated");
 
 		team.setShortName("롯데");
-		this.testRestTemplate.postForEntity("/api/rest/team/2", team, Team.class);
+		this.testRestTemplate.postForEntity("/api/v1/rest/team/2", team, Team.class);
 	}
 }
