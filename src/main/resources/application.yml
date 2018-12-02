@@ -34,3 +34,7 @@ application:
         prefix: SAMPLE_SCHEDULER_THREAD
     pool:
       size: 10
+app:
+  version: v0.1
+mybatis:
+  config-location: classpath:mybatis-config.xml

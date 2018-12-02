@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="star16m.bootsample.resource.service.TeamTestDao">
+
+    <resultMap id="teamTest" type="TeamTest">
+        <result property="id" column="id" />
+        <result property="fullName" column="full_name" />
+        <result property="shortName" column="short_name" />
+        <result property="ipAddress" column="ipaddress" />
+    </resultMap>
+    <select id="findAll" resultMap="teamTest">
+        SELECT * FROM tb_team_test t
+    </select>
+    <insert id="create">
+        insert into tb_team_test(id, full_name, short_name, ipaddress) values (#{id}, #{fullName}, #{shortName}, #{ipAddress})
+    </insert>
+
+</mapper>

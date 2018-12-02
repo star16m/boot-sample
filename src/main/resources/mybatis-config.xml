@@ -1,14 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="$CONTROLLER_NAME$"
-            prefHeight="400.0" prefWidth="600.0">
-
-</AnchorPane>
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <typeAliases>
+        <!--<typeAlias alias="inetTypeHandler" type="star16m.bootsample.resource.entity.InetAddressTypeHandler"/>-->
+        <package name="star16m.bootsample.resource.entity"/>
+    </typeAliases>
+    <typeHandlers>
+        <typeHandler jdbcType="OTHER" handler="star16m.bootsample.resource.entity.InetAddressTypeHandler" />
+    </typeHandlers>
+    <mappers>
+        <mapper resource="mapper/test.xml"/>
+    </mappers>
+</configuration>
