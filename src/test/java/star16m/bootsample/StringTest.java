@@ -12,7 +12,15 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class StringTest {
     enum Patterns {
+        ALPHA_NUMERIC("^[a-zA-Z0-9]+$"),
+        ALPHA("^[a-zA-Z]+$"),
+        ASCII("[\\x00-\\x7F]"),
+        DIGIT("^[0-9]+$"),
+        ALPHA_LOWER("^[a-z]+$"),
+        ALPHA_UPPER("^[A-Z]+$"),
         PASSWORD("^[a-z]+(?=.*?[a-z])(?=.*?[A-Z])(?=.*?\\d)[a-zA-Z\\d]{8,100}$"),
+        EMAIL("^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$"),
+        TEL("^\\d{2,3}-\\d{4}-\\d{4}$"),
         ;
         private Pattern pattern;
         Patterns(String patternString) {
@@ -36,6 +44,10 @@ public class StringTest {
         // 숫자 대소문자 포함(숫자 시작)
         assertThat(Patterns.PASSWORD.valid("1aA234567890")).isFalse();
         // 숫자 대소문자 포함
+
+        assertThat(Patterns.PASSWORD.valid("a1aA234567890")).isTrue();
+
+
         assertThat(Patterns.PASSWORD.valid("a1aA234567890")).isTrue();
     }
 }
