@@ -18,7 +18,7 @@ public class StringTest {
         DIGIT("^[0-9]+$"),
         ALPHA_LOWER("^[a-z]+$"),
         ALPHA_UPPER("^[A-Z]+$"),
-        PASSWORD("^[a-z]+(?=.*?[a-z])(?=.*?[A-Z])(?=.*?\\d)[a-zA-Z\\d]{8,100}$"),
+        PASSWORD("(?=.*?[a-z])(?=.*?[A-Z])(?=.*?\\d)(?=.*?[!@#\\$%^&\\*\\(\\)\\-_=\\+])"),
         EMAIL("^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$"),
         TEL("^\\d{2,3}-\\d{4}-\\d{4}$"),
         ;
@@ -26,7 +26,7 @@ public class StringTest {
         Patterns(String patternString) {
             this.pattern = Pattern.compile(patternString);
         }
-        public boolean valid(String testString) {
+        public boolean match(String testString) {
             return pattern.matcher(testString).find();
         }
 
@@ -34,20 +34,21 @@ public class StringTest {
     @Test
     public void test문자열포함() {
         // 문자열 길이
-        assertThat(Patterns.PASSWORD.valid("a1aA234")).isFalse();
+        assertThat(Patterns.PASSWORD.match("a1aA234")).isFalse();
         // 문자열 길이(초과)
-        assertThat(Patterns.PASSWORD.valid("a1A" + IntStream.rangeClosed(1, 100).mapToObj(i->"a").collect(Collectors.joining()))).isFalse();
+        assertThat(Patterns.PASSWORD.match("a1A" + IntStream.rangeClosed(1, 100).mapToObj(i->"a").collect(Collectors.joining()))).isFalse();
         // 숫자만 포함
-        assertThat(Patterns.PASSWORD.valid("12345678")).isFalse();
+        assertThat(Patterns.PASSWORD.match("12345678")).isFalse();
         // 숫자 소문자 포함
-        assertThat(Patterns.PASSWORD.valid("1a234567890")).isFalse();
+        assertThat(Patterns.PASSWORD.match("1a234567890")).isFalse();
         // 숫자 대소문자 포함(숫자 시작)
-        assertThat(Patterns.PASSWORD.valid("1aA234567890")).isFalse();
+        assertThat(Patterns.PASSWORD.match("1aA234567890")).isFalse();
         // 숫자 대소문자 포함
 
-        assertThat(Patterns.PASSWORD.valid("a1aA234567890")).isTrue();
+        assertThat(Patterns.PASSWORD.match("@a1aA234567890")).isTrue();
+        assertThat(Patterns.PASSWORD.match("a1aA234567890#")).isTrue();
 
 
-        assertThat(Patterns.PASSWORD.valid("a1aA234567890")).isTrue();
+        assertThat(Patterns.PASSWORD.match("&a1aA2345_67890")).isTrue();
     }
 }
