@@ -40,7 +40,7 @@ public class ActionController {
         this.actionExecutor = actionExecutor;
     }
     @GetMapping
-    @SwaggerOperation(name = "hahahaha", value = {
+    @SwaggerOperation(name = "전체 action 조회", value = {
             @ResultMessage(code = ResultCode.SUCCESS, description = "")
     }
     )
