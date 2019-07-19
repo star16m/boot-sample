@@ -1,0 +1,48 @@
+################################################################################
+# Default setting for tools
+################################################################################
+app:
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/
+    username: postgres
+    password: postgres
+
+  command:
+    rdb:
+      query:
+        scripts:
+          slow_query: >
+            SELECT current_timestamp - query_start as runtime, datname, usename, pid, query, usesysid, application_name, client_addr, client_hostname, client_port
+              FROM pg_stat_activity p
+             WHERE state = 'active'
+               AND current_timestamp - query_start > '1sec'::interval
+             ORDER BY runtime
+    script:
+      commands:
+        ls: >
+          ls -al
+        process: >
+          perl -le 'print qq|#|x100 . q|PROCESS ID LIST|' && jps -l | grep -v 'Jps' | perl -lane 'printf qq|%60s\t%s\n|, $F[1], $F[0]'
+
+################################################################################
+# Default setting for spring-shell
+################################################################################
+logging:
+  level:
+    root: error
+spring:
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
+  shell:
+    command:
+      history:
+        enabled: false
+      script:
+        enabled: false
+      quit:
+        enabled: false

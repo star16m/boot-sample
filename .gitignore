@@ -23,3 +23,7 @@
 /dist/
 /nbdist/
 /.nb-gradle/
+
+### for application ###
+spring-shell.log
+*/target/

@@ -6,7 +6,12 @@
 	<groupId>star16m</groupId>
 	<artifactId>boot-sample</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+    <modules>
+		<module>core</module>
+        <module>tools</module>
+		<module>web</module>
+	</modules>
+    <packaging>pom</packaging>
 
 	<name>boot-sample</name>
 	<description>Demo project for Spring Boot</description>
@@ -102,15 +107,5 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
-
 
 </project>
