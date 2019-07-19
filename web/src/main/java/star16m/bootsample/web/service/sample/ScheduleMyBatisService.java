@@ -2,7 +2,6 @@ package star16m.bootsample.web.service.sample;
 
 import org.springframework.stereotype.Component;
 import star16m.bootsample.web.resource.sample.Schedule;
-import star16m.bootsample.web.service.BaseJpaService;
 import star16m.bootsample.web.service.BaseMyBatisService;
 import star16m.bootsample.web.service.BaseService;
 

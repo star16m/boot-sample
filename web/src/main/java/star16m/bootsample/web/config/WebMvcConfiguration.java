@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.servlet.WebMvcRegistrations;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.style.ToStringCreator;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
@@ -53,10 +52,12 @@ public class WebMvcConfiguration implements WebMvcConfigurer, WebMvcRegistration
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/rest/**")
                 .allowedOrigins("*")
-                .allowedMethods(Arrays.asList(HttpMethod.values()).stream()
-                        .map(HttpMethod::name)
-                        .collect(Collectors.toList())
-                        .toArray(new String[0]))
+                .allowedMethods(
+                        Arrays.asList(HttpMethod.values())
+                                .stream()
+                                .map(HttpMethod::name)
+                                .collect(Collectors.toList())
+                                .toArray(new String[0]))
                 .allowCredentials(false)
                 .maxAge(3600);
     }
@@ -65,6 +66,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer, WebMvcRegistration
     public RequestMappingHandlerMapping getRequestMappingHandlerMapping() {
         return new CommonRequestMappingHandlerMapping();
     }
+
     @Bean
     public Jackson2ObjectMapperBuilder getObjectMapperBuilder() {
         Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
@@ -105,7 +107,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer, WebMvcRegistration
         messageConverters.add(jsonMessageConverter);
         restTemplate.getMessageConverters().addAll(messageConverters);
         restTemplate.getInterceptors().add((request, body, execution) -> {
-            ClientHttpResponse response = execution.execute(request,body);
+            ClientHttpResponse response = execution.execute(request, body);
             response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
             return response;
         });
@@ -117,20 +119,23 @@ public class WebMvcConfiguration implements WebMvcConfigurer, WebMvcRegistration
     public final SimpleResponse<?> handleResourceNotfoundException(ResourceNotfoundException e, WebRequest request) {
         return handle(e, request, ResultCode.RESOURCE_NOT_FOUND);
     }
+
     @ExceptionHandler(SimpleRequestException.class)
     public final SimpleResponse<?> handleSimpleRequestException(SimpleRequestException e, WebRequest request) {
         return handle(e, request, ResultCode.BAD_REQUEST);
     }
+
     @ExceptionHandler(SimpleException.class)
     public final SimpleResponse<?> handlerSimpleException(SimpleException e, WebRequest request) {
         return handle(e, request, ResultCode.INTERNAL_ERROR);
     }
+
     @ExceptionHandler(Exception.class)
     public final SimpleResponse<?> handleException(Throwable e, WebRequest request) {
         return handle(e, request, ResultCode.FAIL);
     }
 
-    private final SimpleResponse<?> handle(Throwable e, WebRequest request, ResultCode resultCode) {
+    private SimpleResponse<?> handle(Throwable e, WebRequest request, ResultCode resultCode) {
         if (log.isErrorEnabled()) {
             log.error("Error occurred resultCode [{}]", resultCode);
         }

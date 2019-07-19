@@ -58,9 +58,7 @@ public enum RestAPI {
                 .port(this.port)
                 .path(this.path);
         if (SimpleUtil.isNotNullAndIsNotEmpty(parameterMap)) {
-            parameterMap.entrySet().parallelStream().forEach(param -> {
-                componentsBuilder.queryParam(param.getKey(), param.getValue());
-            });
+            parameterMap.entrySet().parallelStream().forEach(param -> componentsBuilder.queryParam(param.getKey(), param.getValue()));
         }
         UriComponents uriComponents = componentsBuilder.build();
         if (SimpleUtil.isNotNull(pathVariable) && pathVariable.length > 0) {

@@ -23,4 +23,5 @@ public @interface SimpleRestController {
             SimpleRestMethod.DELETE,
             SimpleRestMethod.UPDATE,
     };
+    String summary() default ""; // for swagger
 }

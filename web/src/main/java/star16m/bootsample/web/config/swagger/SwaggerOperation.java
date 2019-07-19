@@ -10,4 +10,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SwaggerOperation {
     ResultMessage[] value() default { @ResultMessage(code = ResultCode.SUCCESS, description = "성공") };
+    String name() default "";
 }

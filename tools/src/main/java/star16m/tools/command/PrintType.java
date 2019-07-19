@@ -3,12 +3,11 @@ package star16m.tools.command;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 public enum PrintType {
     map((r,h) -> r),
     json((r,h) -> ToolsUtils.getJsonArray(r)),
-    table((r,h) -> ToolsUtils.getTableModel(r,h)),
+    table(ToolsUtils::getTableModel),
     ;
 
     private final BiFunction<List<Map<String, Object>>, Boolean, Object> wrapper;

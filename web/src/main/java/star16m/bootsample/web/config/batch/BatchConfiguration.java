@@ -42,20 +42,19 @@ import java.util.Map;
 @EnableBatchProcessing
 public class BatchConfiguration {
     private final DataSource dataSource;
-    private final NamedParameterJdbcTemplate jdbcTemplate;
     private final ActionProvider actionProvider;
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
     private final int chunkSize;
 
-    public BatchConfiguration(DataSource dataSource, NamedParameterJdbcTemplate jdbcTemplate, ActionProvider actionProvider, JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory, @Value("${spring.batch.chunksize:100}") int chunkSize) {
+    public BatchConfiguration(DataSource dataSource, ActionProvider actionProvider, JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory, @Value("${spring.batch.chunksize:100}") int chunkSize) {
         this.dataSource = dataSource;
-        this.jdbcTemplate = jdbcTemplate;
         this.actionProvider = actionProvider;
         this.jobBuilderFactory = jobBuilderFactory;
         this.stepBuilderFactory = stepBuilderFactory;
         this.chunkSize = chunkSize;
     }
+
     @Bean
     public DefaultBatchConfigurer batchConfigurer() {
         return new DefaultBatchConfigurer() {
@@ -80,6 +79,8 @@ public class BatchConfiguration {
                     this.jobLauncher = jobLauncher;
 
                 } catch (Exception e) {
+                    // ignore exception.
+                    log.error("Error occurred while initialize batch job repository.", e);
                 }
             }
 
@@ -99,6 +100,7 @@ public class BatchConfiguration {
             }
         };
     }
+
     @Bean
     public Job simpleJob(NamedParameterJdbcTemplate jdbcTemplate) {
         return jobBuilderFactory.get("actionJob")
@@ -106,6 +108,7 @@ public class BatchConfiguration {
                 .incrementer(new RunIdIncrementer())
                 .build();
     }
+
     @Bean
     @JobScope
     public Step actionStep(@Value("#{jobParameters[actionName]}") String actionName) {
@@ -113,8 +116,12 @@ public class BatchConfiguration {
         log.debug("action step as [{}]", action);
         ItemReader<Map<String, Object>> reader = null;
         switch (action.getReadType()) {
-            case csv: reader = readerWithFile(actionName); break;
-            case db : reader = readerWithDb(actionName); break;
+            case csv:
+                reader = readerWithFile(actionName);
+                break;
+            case db:
+                reader = readerWithDb(actionName);
+                break;
             default:
         }
         ItemWriter<Map<String, Object>> writer = null;
@@ -134,7 +141,8 @@ public class BatchConfiguration {
                 .writer(writer)
                 .build();
     }
-    @Bean(destroyMethod="")
+
+    @Bean(destroyMethod = "")
     @StepScope
     public JdbcCursorItemReader<Map<String, Object>> readerWithDb(@Value("#{jobParameters[actionName]}") String actionName) {
         Action action = this.actionProvider.getAction(actionName).orElseThrow(() -> new ResourceNotfoundException(actionName));
@@ -176,7 +184,7 @@ public class BatchConfiguration {
                 .build();
     }
 
-    @Bean(destroyMethod="")
+    @Bean(destroyMethod = "")
     @StepScope
     public FlatFileItemReader<Map<String, Object>> readerWithFile(@Value("#{jobParameters[actionName]}") String actionName) {
         Action action = this.actionProvider.getAction(actionName).orElseThrow(() -> new ResourceNotfoundException(actionName));

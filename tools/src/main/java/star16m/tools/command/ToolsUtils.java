@@ -61,9 +61,7 @@ public class ToolsUtils {
 
         if (addHeader) {
             Map<String, Object> headerMap = new LinkedHashMap<>();
-            dataList.get(0).entrySet().stream().forEach(e -> {
-                headerMap.put(e.getKey(), e.getKey());
-            });
+            dataList.get(0).entrySet().stream().forEach(e -> headerMap.put(e.getKey(), e.getKey()));
             dataList.add(0, headerMap);
         }
         return getTableModel(dataList.stream().map(m -> m.values().stream()
@@ -96,12 +94,10 @@ public class ToolsUtils {
         return (lines, tableWidth, nbColumns) -> {
             int max = 0;
             int min = 0;
-            for (int i = 0; i < lines.length; i++) {
-                String line = lines[i];
+            for (String line : lines) {
                 String[] words = line.split("-");
-                String[] lineWords = words;
                 for (int j = 0; j < words.length; j++) {
-                    String word = lineWords[j];
+                    String word = words[j];
                     min = Math.max(min, getRealStringLength(word));
                 }
                 max = Math.max(max, getRealStringLength(line));
@@ -136,27 +132,34 @@ public class ToolsUtils {
     }
     private static boolean isHalfWidth(char ch) {
         // 특수문자
-        if (ch < 0x0020) return true;
+        if (ch < 0x0020) {
+            return true;
+        }
         // ASCII(Latin characters, symbols, func, numbers)
-        if (0x0020 <= ch && ch <= 0x007F) return true;
+        if (0x0020 <= ch && ch <= 0x007F) {
+            return true;
+        }
         // FF61 ~ FF64 : HalfWidth CJK
         // FF65 ~ FF9F : HalfWidth Katakana
         // FFA0 ~ FFDC : HalfWidth Hangul
-        if (0xFF61 <= ch && ch <= 0xFFDC) return true;
+        if (0xFF61 <= ch && ch <= 0xFFDC) {
+            return true;
+        }
         // FFE8 ~ FFEE : HalfWidth symbol
-        if (0xFFE8 <= ch && ch <= 0xFFEE) return true;
+        if (0xFFE8 <= ch && ch <= 0xFFEE) {
+            return true;
+        }
         return false;
     }
     private static TextWrapper getTextWrapper() {
         return (original, columnWidth) -> {
             List<String> result = new ArrayList<>(original.length);
-            String[] columnStrings = original;
             int originalLength = original.length;
 
             for (int columnIndex = 0; columnIndex < originalLength; columnIndex++) {
                 String line;
                 int split;
-                for (line = columnStrings[columnIndex]; line.length() > columnWidth; line = line.substring(split == -1 ? columnWidth : split + 1)) {
+                for (line = original[columnIndex]; line.length() > columnWidth; line = line.substring(split == -1 ? columnWidth : split + 1)) {
                     split = line.lastIndexOf(' ', columnWidth);
                     String toAdd = split == -1 ? line.substring(0, columnWidth) : line.substring(0, split);
                     result.add(String.format("%-" + columnWidth + "s", toAdd));

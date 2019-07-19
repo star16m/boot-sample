@@ -7,7 +7,7 @@ import star16m.bootsample.web.resource.sample.Resource;
 import star16m.bootsample.web.controller.annotations.SimpleRestController;
 import star16m.bootsample.web.service.sample.PlayerJpaService;
 
-@SimpleRestController(path = "/api/rest/v1/player")
+@SimpleRestController(path = "/api/rest/v1/player", summary = "야구선수 API")
 @Api(tags = { "Player" })
 public class PlayerController extends BaseController<Player, Integer> {
     private PlayerJpaService playerService;

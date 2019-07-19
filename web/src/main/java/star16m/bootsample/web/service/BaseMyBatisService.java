@@ -13,7 +13,7 @@ import java.util.Optional;
 public abstract class BaseMyBatisService<T extends BaseResource, I> implements BaseService<T,I> {
     private BaseMyBatisRepository<T, I> simpleRepository;
 
-    public BaseMyBatisService(BaseMyBatisRepository simpleRepository) {
+    public BaseMyBatisService(BaseMyBatisRepository<T, I> simpleRepository) {
         this.simpleRepository = simpleRepository;
     }
 

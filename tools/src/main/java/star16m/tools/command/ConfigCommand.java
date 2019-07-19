@@ -29,7 +29,7 @@ public class ConfigCommand {
         }
         this.appKeyMapList = map.entrySet().stream().filter(e -> e.getKey().startsWith("app")).sorted(comparingByKey()).collect(
                 Collectors.toMap(
-                        e -> e.getKey(),
+                        Map.Entry::getKey,
                         e -> environment.getProperty(e.getKey()),
                         (v1, v2) -> {
                             throw new RuntimeException(String.format("Duplicate application key. key[%s], value[%s]", v1, v2));

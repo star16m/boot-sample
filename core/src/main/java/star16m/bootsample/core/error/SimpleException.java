@@ -4,9 +4,11 @@ import java.text.MessageFormat;
 
 public class SimpleException extends RuntimeException {
     private String message;
+
     public SimpleException(String message) {
         this.message = message;
     }
+
     public SimpleException(String message, Object... objects) {
         this(MessageFormat.format(message, objects));
     }
@@ -15,5 +17,4 @@ public class SimpleException extends RuntimeException {
     public String getMessage() {
         return message;
     }
-
 }

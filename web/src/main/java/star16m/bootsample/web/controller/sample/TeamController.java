@@ -7,7 +7,7 @@ import star16m.bootsample.web.resource.sample.Team;
 import star16m.bootsample.web.controller.annotations.SimpleRestController;
 import star16m.bootsample.web.service.sample.TeamJpaService;
 
-@SimpleRestController(path = "/api/rest/v1/team")
+@SimpleRestController(path = "/api/rest/v1/team", summary = "야구팀 API")
 @Api(tags = "Team")
 public class TeamController extends BaseController<Team, Integer> {
     private TeamJpaService teamService;

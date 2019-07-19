@@ -26,8 +26,6 @@ public class FtpClient {
         this.password = password;
     }
 
-    // constructor
-
     public void open() throws IOException {
         ftp = new FTPClient();
 

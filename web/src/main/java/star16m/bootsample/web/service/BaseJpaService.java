@@ -13,7 +13,7 @@ import java.util.Optional;
 public abstract class BaseJpaService<T extends BaseResource, I> implements BaseService<T,I> {
     private BaseJpaRepository<T, I> simpleRepository;
 
-    public BaseJpaService(BaseJpaRepository simpleRepository) {
+    protected BaseJpaService(BaseJpaRepository<T, I> simpleRepository) {
         this.simpleRepository = simpleRepository;
     }
 

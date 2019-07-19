@@ -16,7 +16,7 @@ import star16m.bootsample.web.service.action.ActionRequest;
 
 import javax.validation.Valid;
 
-@SimpleRestController(path="/api/rest/v1/batch")
+@SimpleRestController(path="/api/rest/v1/batch", summary = "Batch Action 관리용 API")
 @Api(tags = "Batch")
 public class BatchActionController {
 
@@ -36,16 +36,7 @@ public class BatchActionController {
         JobExecution run = null;
         try {
             run = jobLauncher.run(actionJob, jobParameters);
-        } catch (JobExecutionAlreadyRunningException e) {
-            e.printStackTrace();
-            throw new SimpleException(e.getMessage());
-        } catch (JobRestartException e) {
-            e.printStackTrace();
-            throw new SimpleException(e.getMessage());
-        } catch (JobInstanceAlreadyCompleteException e) {
-            e.printStackTrace();
-            throw new SimpleException(e.getMessage());
-        } catch (JobParametersInvalidException e) {
+        } catch (JobExecutionAlreadyRunningException | JobRestartException | JobInstanceAlreadyCompleteException | JobParametersInvalidException e) {
             e.printStackTrace();
             throw new SimpleException(e.getMessage());
         }

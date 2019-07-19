@@ -7,9 +7,6 @@ import org.springframework.shell.standard.ShellOption;
 import star16m.bootsample.core.utils.SimpleUtil;
 import star16m.tools.command.ToolsUtils;
 
-import java.util.List;
-import java.util.Map;
-
 @ConditionalOnProperty(prefix = "app.command.rdb", value = "enabled", havingValue = "true", matchIfMissing = true)
 @ShellComponent
 public class RDBQueryCommand {
