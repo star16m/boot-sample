@@ -79,6 +79,9 @@ public class JWTAuthenticationManager implements AuthenticationFailureHandler, A
     public JWTAuthenticationToken createAuthenticationToken(HttpServletRequest request) {
         try {
             String parsedToken = request.getHeader(this.headerKey);
+            if (SimpleUtil.isEmpty(parsedToken)) {
+                throw new SimpleAuthenticationException(ResultCode.AUTHENTICATE_ERROR);
+            }
             Claims claims = Jwts.parser().setSigningKey(this.securitySignKey.getBytes())
                     .parseClaimsJws(parsedToken.replace(this.headerPrefix, "").trim())
                     .getBody();
