@@ -2,6 +2,8 @@ logging:
   level:
     star16m: DEBUG
 spring:
+  profiles:
+    include: enabled-swagger
   # datasource
   datasource:
     driver-class-name: org.postgresql.Driver

@@ -43,7 +43,6 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers(
                 "/v2/api-docs",
                 "/configuration/ui",
-                "/swagger-resource",
                 "/configuration/security",
                 "/swagger-ui.html",
                 "/webjars/**",
@@ -61,12 +60,11 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-
         http.cors().and()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS).permitAll()
                 .antMatchers(LOGIN_URL).permitAll()
-                .antMatchers("/api/rest/v1/action").hasRole("ACTION")
+                .antMatchers("/api/rest/v1/action").hasRole("ADMIN")
                 .anyRequest().authenticated()
                 .and().logout()
                 .and().csrf().disable()
@@ -75,7 +73,6 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterAt(jwtAuthenticationFilter(authenticationManager()), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(jwtAuthorizationFilter(authenticationManager()), UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        ;
     }
 
     @Autowired

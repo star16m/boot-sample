@@ -38,7 +38,6 @@ import java.util.stream.Collectors;
 @Component
 @Slf4j
 public class JWTAuthenticationManager implements AuthenticationFailureHandler, AuthenticationSuccessHandler, AccessDeniedHandler {
-    private static final String JWT_AUTHORITY_KEY = "jwt-authority";
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -47,12 +46,16 @@ public class JWTAuthenticationManager implements AuthenticationFailureHandler, A
     private String headerKey;
     @Value("${app.security.header.prefix:Bearer }")
     private String headerPrefix;
+    @Value("${app.security.token.autority:jwt-authority}")
+    private String tokenAuthority;
     @Value("${app.security.signkey:simpleSignKey}")
     private String securitySignKey;
     @Value("${app.security.token.expiration.min:30}")
     private Long expirationMin;
     @Value("${app.security.url:/api/rest}")
     private String securityURIPrefix;
+    @Autowired
+    private JWTTokenExtractor tokenExtractor;
 
     public boolean isSecurityResource(HttpServletRequest request) {
         String requestURI = request.getRequestURI();
@@ -70,15 +73,16 @@ public class JWTAuthenticationManager implements AuthenticationFailureHandler, A
     public String createToken(User user) {
         return Jwts.builder()
                 .setSubject(user.getUserId())
-                .claim(JWT_AUTHORITY_KEY, user.getPrivilege())
+                .claim(tokenAuthority, user.getPrivilege())
                 .setExpiration(new Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(expirationMin)))
                 .signWith(SignatureAlgorithm.HS512, this.getSecuritySignKey().getBytes())
                 .compact();
     }
 
     public JWTAuthenticationToken createAuthenticationToken(HttpServletRequest request) {
+
         try {
-            String parsedToken = request.getHeader(this.headerKey);
+            String parsedToken = tokenExtractor.extract(request);
             if (SimpleUtil.isEmpty(parsedToken)) {
                 throw new SimpleAuthenticationException(ResultCode.AUTHENTICATE_ERROR);
             }
@@ -86,7 +90,7 @@ public class JWTAuthenticationManager implements AuthenticationFailureHandler, A
                     .parseClaimsJws(parsedToken.replace(this.headerPrefix, "").trim())
                     .getBody();
             String userId = claims.getSubject();
-            String authorities = (String)claims.get(JWT_AUTHORITY_KEY);
+            String authorities = (String)claims.get(tokenAuthority);
             if (SimpleUtil.isEmpty(userId) || SimpleUtil.isEmpty(authorities)) {
                 throw new SimpleAuthenticationException(ResultCode.INVALID_TOKEN);
             }
