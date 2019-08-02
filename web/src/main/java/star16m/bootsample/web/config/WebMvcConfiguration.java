@@ -18,8 +18,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.HttpMediaTypeException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.RestTemplate;
@@ -50,14 +56,15 @@ public class WebMvcConfiguration implements WebMvcConfigurer, WebMvcRegistration
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/api/rest/**")
+        registry.addMapping("/**")
                 .allowedOrigins("*")
                 .allowedMethods(
                         Arrays.asList(HttpMethod.values())
                                 .stream()
                                 .map(HttpMethod::name)
                                 .collect(Collectors.toList())
-                                .toArray(new String[0]))
+                                .toArray(new String[0])
+                )
                 .allowCredentials(false)
                 .maxAge(3600);
     }
@@ -130,11 +137,22 @@ public class WebMvcConfiguration implements WebMvcConfigurer, WebMvcRegistration
         return handle(e, request, ResultCode.INTERNAL_ERROR);
     }
 
+    @ExceptionHandler(AuthenticationException.class)
+    public final SimpleResponse<?> handleUserException(AuthenticationException e, WebRequest request) {
+        return handle(e, request, ResultCode.AUTHENTICATE_ERROR);
+    }
+    @ExceptionHandler({HttpRequestMethodNotSupportedException.class, HttpMessageNotReadableException.class, HttpMediaTypeException.class})
+    public final SimpleResponse<?> handleRequestMethodNotSupportedException(Throwable e, WebRequest request) {
+        return handle(e, request, ResultCode.BAD_REQUEST_METHOD);
+    }
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public final SimpleResponse<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException e, WebRequest request) {
+        return handle(e, request, ResultCode.INVALID_ARGUMNET);
+    }
     @ExceptionHandler(Exception.class)
     public final SimpleResponse<?> handleException(Throwable e, WebRequest request) {
         return handle(e, request, ResultCode.FAIL);
     }
-
     private SimpleResponse<?> handle(Throwable e, WebRequest request, ResultCode resultCode) {
         if (log.isErrorEnabled()) {
             log.error("Error occurred resultCode [{}]", resultCode);
