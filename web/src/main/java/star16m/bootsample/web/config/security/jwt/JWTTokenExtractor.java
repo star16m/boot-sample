@@ -49,7 +49,13 @@ public abstract class JWTTokenExtractor {
                 return token;
             }
             String userId = request.getHeader(swaggerHeaderKey);
+            if (SimpleUtil.isEmpty(userId)) {
+                return null;
+            }
             User user = this.userRepository.findByUserId(userId);
+            if (SimpleUtil.isNull(user)) {
+                return null;
+            }
             token = Jwts.builder()
                     .setSubject(userId)
                     .claim(tokenAuthority, user.getPrivilege())
