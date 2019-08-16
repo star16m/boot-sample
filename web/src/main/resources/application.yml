@@ -39,9 +39,10 @@ application:
 app:
   version: v0.1
 mybatis:
-  type-aliases-package: star16m
+  type-aliases-package: star16mstar16m.bootsample.core.resource.entity
   type-handlers-package: star16m.bootsample.web.common.typehandler
   configuration:
-      map-underscore-to-camel-case: true
-      default-fetch-size: 100
-      default-statement-timeout: 30
+    map-underscore-to-camel-case: true
+    default-fetch-size: 100
+    default-statement-timeout: 30
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
