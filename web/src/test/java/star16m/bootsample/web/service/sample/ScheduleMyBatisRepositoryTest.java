@@ -1,13 +1,14 @@
 package star16m.bootsample.web.service.sample;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
+import star16m.bootsample.web.SampleApplication;
 import star16m.bootsample.web.resource.sample.Schedule;
 import star16m.bootsample.web.resource.sample.ScheduleType;
 
@@ -15,8 +16,9 @@ import java.util.List;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+//@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(classes= SampleApplication.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @Transactional
 //if using MybatisTest annotation.
 //@RunWith(SpringRunner.class)
@@ -27,11 +29,11 @@ public class ScheduleMyBatisRepositoryTest {
     @Autowired
     private ScheduleMyBatisRepository scheduleMyBatisRepository;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
     }
 

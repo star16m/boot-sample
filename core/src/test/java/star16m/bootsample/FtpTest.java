@@ -3,10 +3,10 @@ package star16m.bootsample;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.mockftpserver.fake.FakeFtpServer;
 import org.mockftpserver.fake.UserAccount;
 import org.mockftpserver.fake.filesystem.DirectoryEntry;
@@ -30,7 +30,7 @@ public class FtpTest {
 
     private FtpClient ftpClient;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         FileSystem fileSystem;
         boolean isWindow = System.getProperty("os.name").toLowerCase().contains("win");
@@ -53,7 +53,7 @@ public class FtpTest {
         ftpClient.open();
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws IOException {
         ftpClient.close();
         fakeFtpServer.stop();
@@ -67,7 +67,7 @@ public class FtpTest {
         assertThat(fakeFtpServer.getFileSystem().exists("/buz2.txt")).isTrue();
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void test다은이사진가져오기() throws Exception {
         String baseUrl = "http://stak.iptime.org/01033900282/23244-%EC%9D%B4%ED%98%84%EC%A0%95(%EA%B9%80%EB%8B%A4%EC%9D%80)-01-%EC%B4%AC%EC%98%81-50%EC%9D%BC/";
