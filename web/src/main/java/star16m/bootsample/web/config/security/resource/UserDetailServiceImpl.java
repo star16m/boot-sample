@@ -28,7 +28,7 @@ public class UserDetailServiceImpl implements UserDetailsService, Authentication
 
     @Override
     public UserDetails loadUserDetails(PreAuthenticatedAuthenticationToken preAuthenticatedAuthenticationToken) throws UsernameNotFoundException {
-        log.debug("token: [{}]", preAuthenticatedAuthenticationToken);
+        log.debug("preAuthenticatedAuthenticationToken: [{}]", preAuthenticatedAuthenticationToken);
         return null;
     }
 }

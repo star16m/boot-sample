@@ -62,7 +62,7 @@ public abstract class BaseController<T extends BaseResource, I extends Integer> 
     public final SimpleResponse<T> update(@PathVariable final I id, @RequestBody final Map<String, Object> newObjectMap) {
         SimpleUtil.mustNotNull(id);
         SimpleUtil.mustNotNull(newObjectMap);
-        SimpleUtil.must(newObjectMap.keySet().size(), (size) -> size > 0, "not found some update properties.");
+        SimpleUtil.must(newObjectMap.keySet().size(), (size) -> size <= 0, "not found some update properties.");
         log.debug("try update {} with id [{}] to [{}]", this.resource.getDescription(), id, newObjectMap);
         T updatedEntity = this.service.update(id, newObjectMap);
         log.debug("updated with [{}]", updatedEntity);

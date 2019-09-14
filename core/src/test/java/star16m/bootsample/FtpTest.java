@@ -43,7 +43,6 @@ public class FtpTest {
         fakeFtpServer.addUserAccount(new UserAccount(TEST_FTP_USER, TEST_FTP_PASS, TEST_FTP_HOME_DIR));
 
         fileSystem.add(new DirectoryEntry("/Users/star16m/Downloads/fakeftpfiles"));
-//        fileSystem.add(new FileEntry("/Users/star16m/Downloads/fakeftpfiles/foobar.txt", "abcdef 1234567890"));
         fakeFtpServer.setFileSystem(fileSystem);
         fakeFtpServer.setServerControlPort(0);
 
@@ -64,7 +63,7 @@ public class FtpTest {
         File file = new File("/Users/star16m/Downloads/fakeftpfiles/haha.txt");
         ftpClient.putFileToPath(file, "/buz.txt");
         assertThat(fakeFtpServer.getFileSystem().exists("/buz.txt")).isTrue();
-        assertThat(fakeFtpServer.getFileSystem().exists("/buz2.txt")).isTrue();
+        assertThat(fakeFtpServer.getFileSystem().exists("/buz2.txt")).isFalse();
     }
 
     @Disabled

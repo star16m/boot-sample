@@ -1,7 +1,8 @@
 package star16m.bootsample;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -9,7 +10,8 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@ExtendWith(SpringExtension.class)
 public class StringTest {
     enum Patterns {
         ALPHA_NUMERIC("^[a-zA-Z0-9]+$"),

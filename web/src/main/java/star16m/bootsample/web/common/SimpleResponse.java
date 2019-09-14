@@ -1,21 +1,25 @@
 package star16m.bootsample.web.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import star16m.bootsample.web.model.ResultCode;
 
 import java.io.Serializable;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class SimpleResponse<T> implements Serializable {
     private static final long serialVersionUID = -216154267378726512L;
     private T body;
     private ResultCode result;
-    public int getResultCode() {
-        return this.result.getCode();
-    }
+//    public int getResultCode() {
+//        return this.result.getCode();
+//    }
+    @JsonIgnore
     @JsonProperty("isOk")
     public boolean isOk() {
         return this.result.equals(ResultCode.SUCCESS);
