@@ -6,8 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import star16m.bootsample.core.error.ResourceNotfoundException;
+import star16m.bootsample.core.error.SimpleException;
 import star16m.bootsample.core.utils.SimpleUtil;
 import star16m.bootsample.web.common.SimpleResponse;
+import star16m.bootsample.web.config.security.resource.User;
 import star16m.bootsample.web.controller.annotations.SimpleRestMethod;
 import star16m.bootsample.web.controller.annotations.SimpleRestMethodMapping;
 import star16m.bootsample.web.resource.BaseResource;
@@ -21,6 +23,7 @@ import java.util.Optional;
 @Api
 @Slf4j
 public abstract class BaseController<T extends BaseResource, I extends Integer> {
+
     private Resource resource;
     private BaseService<T, I> service;
     protected BaseController(Resource resource, BaseService<T, I> service) {
@@ -80,6 +83,6 @@ public abstract class BaseController<T extends BaseResource, I extends Integer> 
     private T getObject(final I id) {
         Optional<T> optionalObject = this.service.findOne(id);
         // return null
-        return optionalObject.orElse(null);
+        return optionalObject.orElseThrow(() -> new SimpleException("Object not found"));
     }
 }

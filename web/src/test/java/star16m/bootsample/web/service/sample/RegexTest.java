@@ -17,18 +17,20 @@ public class RegexTest {
 
     private String targetString =
             "select regexp_replace(nvl(v1haha, 'v1hehe') + 1, 'hoho'  ) as v1, " +
-            "regexp_replace(trim(nvl(v2haha)), 'hoho') as v2, " +
-            "regexp_replace(trim(v3haha), trim(nvl('hoho')), '$1$1') as v3 " +
-            "regexp_replace(v4) as v4 " +
-            "regexp_replace(v5haha) as v5 " +
-            "regexp_replace(haha, nvl(v6haha, hoho), hoho) as v6 " +
-            "regexp_replace(haha, haha, nvl(v7haha) ) as v7 " +
-            "regexp_replace() as v8 " +
-            "regexp_replace( ) as v9 " +
-            "from dual;";
+                    "regexp_replace(trim(nvl(v2haha)), 'hoho') as v2, " +
+                    "regexp_replace(trim(v3haha), trim(nvl('hoho')), '$1$1') as v3 " +
+                    "regexp_replace(v4) as v4 " +
+                    "regexp_replace(v5haha) as v5 " +
+                    "regexp_replace(haha, nvl(v6haha, hoho), hoho) as v6 " +
+                    "regexp_replace(haha, haha, nvl(v7haha) ) as v7 " +
+                    "regexp_replace() as v8 " +
+                    "regexp_replace( ) as v9 " +
+                    "from dual;";
+
     private Pattern getPattern(String patternString) {
         return Pattern.compile(patternString, Pattern.CASE_INSENSITIVE);
     }
+
     @Test
     public void test1() {
 //        Matcher matcher = getPattern("(?=\\()(?:(?=.*?\\((?!.*?\\1)(.*\\)(?!.*\\2).*))(?=.*?\\)(?!.*?\\2)(.*)).)+?.*?(?=\\1)[^(]*(?=\\2$)").matcher(targetString);
@@ -46,18 +48,26 @@ public class RegexTest {
 //            AtomicInteger argumentNum = new AtomicInteger(0);
 //            log.info("\n{}", Arrays.asList(arguments).stream().map(v -> "\t [" + argumentNum.incrementAndGet() + "] : " + v.replaceAll("<REGEX_COMMA>", ",")).collect(Collectors.joining("\n")));
 //        }
-        List<FunctionInfo> regexp_replace = foundFunctionInfo(targetString, "regexp_replace");
-        log.info("functions ##############\n[{}]\n###################", regexp_replace);
+//        List<FunctionInfo> regexp_replace = foundFunctionInfo(targetString, "regexp_replace");
+//        log.info("functions ##############\n[{}]\n###################", regexp_replace);
+
+        String subjectString = "select to_date(sysdate - nvl(a.haha_date, sysdate) + 1, 'yyyymmdd'  ) as v1 from dual ";
+        Pattern regex = Pattern.compile("[+*/]|(?<=\\s)-");
+        Matcher matcher = regex.matcher(subjectString);
+        while (matcher.find()) {
+            String string = matcher.group();
+            System.out.println("matched : " + string);
+        }
+
 
     }
 
     private String replaceComma(String originalString) {
         Objects.requireNonNull(originalString);
-        Pattern pattern = Pattern.compile("\\w*(?:\\s*)(?=\\()(?:(?=.*?\\((?!.*?\\1)(.*\\)(?!.*\\2).*))(?=.*?\\)(?!.*?\\2)(.*)).)+?.*?(?=\\1)[^(]*(?=\\2$)");
+        Pattern pattern = Pattern.compile("\\w*(?:\\s*)(?=\\()(?:(?=.*?\\((?!.*?\1)(.*\\)(?!.*\2).*))(?=.*?\\)(?!.*?\2)(.*)).)+?.*?(?=\\1)[^(]*(?=\\2$)");
         Matcher matcher = pattern.matcher(originalString);
         String replaceString = originalString;
-        if (matcher.find())
-        {
+        if (matcher.find()) {
             String matchedString = matcher.group();
             replaceString = replaceString.replace(matchedString, matchedString.replaceAll(",", "<REGEX_COMMA>"));
         }
@@ -74,13 +84,14 @@ public class RegexTest {
             this.arguments = Arrays.asList(arguments);
         }
     }
+
     public List<FunctionInfo> foundFunctionInfo(String originalString, String functionName) {
         Objects.requireNonNull(originalString);
         Objects.requireNonNull(functionName);
         if (!originalString.toUpperCase().contains(functionName.toUpperCase())) {
             return Collections.emptyList();
         }
-        Pattern functionPattern = Pattern.compile(functionName + "\\s*(?=\\()(?:(?=.*?\\((?!.*?\\1)(.*\\)(?!.*\\2).*))(?=.*?\\)(?!.*?\\2)(.*)).)+?.*?(?=\\1)[^(]*(?=\\2$)", Pattern.CASE_INSENSITIVE);
+        Pattern functionPattern = Pattern.compile(functionName + "\\s*(?=\\()(?:(?=.*?\\((?!.*?\1)(.*\\)(?!.*\2).*))(?=.*?\\)(?!.*?\2)(.*)).)+?.*?(?=\\1)[^(]*(?=\\2$)", Pattern.CASE_INSENSITIVE);
         Matcher functionMatcher = functionPattern.matcher(originalString);
         List<FunctionInfo> functionInfoList = new ArrayList<>();
         while (functionMatcher.find()) {
